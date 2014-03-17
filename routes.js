@@ -6,7 +6,6 @@ var fs=require('fs');
 var util = require('./services/util');
 var obj  = require('./services/obj');
 var settings = require('./settings');
-var user = require('./models/user');
 
 module.exports = function(app) {
   
@@ -18,9 +17,9 @@ module.exports = function(app) {
 
   //全局参数，用于认引擎加入
   var resbefore=function(req,res,next){
-    if (req.session.user) {
+    if (req.session.auth) {
       //req.session.user.name = 'mrlong';
-      res.locals.user = req.session.user;
+      res.locals.auth = req.session.auth;
       res.locals.path = "'" + req.path + "'";
       return next();
     }
@@ -32,7 +31,9 @@ module.exports = function(app) {
       var auth_token = util.decrypt(cookie, settings.sessionSecret);
       var auth = auth_token.split('\t');
       var user_id = auth[0];
-      user.getUserById(user_id,function(err,user){
+      return next();
+      
+      /*user.getUserById(user_id,function(err,user){
         if(!err && user){
           user.logincount++;
           user.lastlogin = Date.now();
@@ -41,12 +42,12 @@ module.exports = function(app) {
           //req.session.user.name = 'mrlong'
           res.locals.user = user;
 
-          return next();
+          
         }
         else{
           return next(err);
         }
-      });
+      });*/
     };
     //res.locals.user = new obj({name:'mrlong'});
   };   
